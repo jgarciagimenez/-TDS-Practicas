@@ -1,0 +1,6 @@
+1.- Teoría
+2.- x = media + varianza + rand (1,N) ; N = número de muestras     media =0 varianza=1
+3.- Estimar autocorrelación fórmulas
+4.- xcorr autocorre y correlación cruzada
+5.- media = 1 varianza = 1
+6.- mediai de 100 autocorr con sesgo y sin sesgo.

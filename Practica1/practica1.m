@@ -2,17 +2,22 @@ clear all
 close all
 
 
-% % % % Tarea 1 % % % % 
+										% % % % Tarea 1 % % % % 
+
 % Hacer la demostración de la diapositiva 24 del tema 2
 
 
-% % % % Tarea 2 % % % % 
+
+
+										% % % % Tarea 2 % % % % 
 N=1000;
 media = 0;
 varianza = 1;
 x = media + varianza*rand(1,N);
 
-% % % %  Tarea 3 % % % % 
+
+	
+										% % % %  Tarea 3 % % % % 
 
 %%% Método con la primera función
 suma = 0;
@@ -28,35 +33,47 @@ end
 
 r=[autocorr(N:-1:2) autocorr];  %% Hago la simetría para obtener la correlación completa
 
-figure
-plot (r),title('primera aproximación del guión')
-
-%%%% Método dos con las funciones de convolución
+	%%%% Método dos con las funciones de convolución
 
 r2=(conv(x,x(N:-1:1)))/N;
 
-figure
-plot(r2),title('hecho con el método de la convolución');
+	%%%% método con la función de matlab xcorr  
 
-%%%% método con la función de matlab xcorr  
-figure 
-plot (xcorr(x,'biased')),title('Método xcorr MATLAB con sesgo')
+r3 = xcorr(x,'biased')
 
-%%%% Delta de dirac
+	%%%% Delta de dirac
 
 delta=zeros(1,2*N-1);
 delta(N)=1;
 
-figure
+
+
+subplot(2,2,1)
+plot (r),title('primera aproximación del guión')
+
+subplot(2,2,2)
+plot(r2),title('hecho con el método de la convolución');
+
+subplot(2,2,3)
+plot (r3,title('Método xcorr MATLAB con sesgo')
+
+subplot(2,2,4)
 plot(delta),title('delta de dirac')
 
 
-% % % % Tarea 4 % % % % 
+
+
+										% % % % Tarea 4 % % % % 
 
 figure 
-plot (xcorr(x,'unbiased')),title('Método xcorr MATLAB sin sesgo')
+r4 = xcorr(x,'biased')
+plot (r4),title('Método xcorr MATLAB sin sesgo y sin sesgo')
+hold on
+plot (r3,'g')
+legend('Sin sesgo','Con sesgo')
 
-% % % % Tarea 5 % % % % 
+
+										% % % % Tarea 5 % % % % 
 
 N=1000;
 media = 1;
@@ -69,8 +86,28 @@ hold on
 plot(xcorr(x,'biased'),'g')
 
 
-% % % % Tarea 6 % % % % 
 
+										% % % % Tarea 6 % % % 
+rMeanBiased = zeros (1,2*N-1);
+rMeanUnbiased = zeros (1,2*N-1)
+
+for i =0:100
+	x2 = media + varianza*rand(1,N);
+	
+	rMeanBiased += xcorr(x2,'biased');
+	rMeanUnbiased += xcorr(x2,'unbiased');
+end
+
+rMeanBiased = rMeanBiased./100;
+rMeanUnbiased = rMeanUnbiased./100;
+
+figure
+subplot(1,2,1)
+plot(rMeanBiased)
+title ('Biased')
+subplot(1,2,2)
+plot(rMeanUnBiased)
+title ('Unbiased')
 
 
 

@@ -75,14 +75,12 @@ ax = inv(Rx)*-rx;
 
 %%%% Tarea 6 %%%%
 
-PSD4 = 1./fft([1 ax'],1024).^2;
-
 figure 
 hold on 
 plot(abs(PSD1));
 plot(abs(PSD2),'g');
-plot(abs(PSD4),'r');
-legend('original','con sesgo','estimado parámetros con sesgo')
+plot(abs(PSD3),'r');
+legend('original','con sesgo','sin sesgo')
 
 
 

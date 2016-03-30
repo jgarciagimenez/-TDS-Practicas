@@ -1,21 +1,14 @@
 clear all
 close all
 
-
 										% % % % Tarea 1 % % % % 
-
-% Hacer la demostración de la diapositiva 24 del tema 2
-
-
-
 
 										% % % % Tarea 2 % % % % 
 N=1000;
 media = 0;
 varianza = 1;
-x = media + varianza*rand(1,N);
-
-
+x = media + varianza*randn(1,N);
+l=-999:1:999;
 	
 										% % % %  Tarea 3 % % % % 
 
@@ -39,7 +32,7 @@ r2=(conv(x,x(N:-1:1)))/N;
 
 	%%%% método con la función de matlab xcorr  
 
-r3 = xcorr(x,'biased')
+r3 = xcorr(x,'biased');
 
 	%%%% Delta de dirac
 
@@ -47,55 +40,51 @@ delta=zeros(1,2*N-1);
 delta(N)=1;
 
 
-
 subplot(2,2,1)
-plot (r),title('primera aproximación del guión')
+plot (l,r),title('primera aproximación del guión');
 
 subplot(2,2,2)
-plot(r2),title('hecho con el método de la convolución');
+plot(l,r2),title('hecho con el método de la convolución');
 
 subplot(2,2,3)
-plot (r3,title('Método xcorr MATLAB con sesgo')
+plot (l,r3),title('Método xcorr MATLAB con sesgo');
 
 subplot(2,2,4)
-plot(delta),title('delta de dirac')
-
-
+plot(l,delta),title('delta de dirac');
 
 
 										% % % % Tarea 4 % % % % 
 
 figure 
-r4 = xcorr(x,'biased')
-plot (r4),title('Método xcorr MATLAB sin sesgo y sin sesgo')
+r4 = xcorr(x,'unbiased');
+plot (l,r4),title('Método xcorr MATLAB sin sesgo y sin sesgo')
 hold on
-plot (r3,'g')
-legend('Sin sesgo','Con sesgo')
+plot (l,r3,'g')
+legend('Sin sesgo','Con sesgo');
+hold off
 
 
 										% % % % Tarea 5 % % % % 
 
 N=1000;
-media = 1;
-varianza = 1;
-x = media + varianza*rand(1,N);
+media2 = 1;
+varianza2 = 1;
+x2 = media2 + varianza2*randn(1,N);
 
 figure
-plot(xcorr(x,'unbiased')),'r',title('media 1 con sesgo y sin sesgo')
+plot(l,xcorr(x2,'unbiased')),'r',title('media 1 con sesgo y sin sesgo')
 hold on
-plot(xcorr(x,'biased'),'g')
-
+plot(l,xcorr(x2,'biased'),'g')
 
 
 										% % % % Tarea 6 % % % 
 rMeanBiased = zeros (1,2*N-1);
-rMeanUnbiased = zeros (1,2*N-1)
+rMeanUnbiased = zeros (1,2*N-1);
 
 for i =0:100
-	x2 = media + varianza*rand(1,N);
-	
-	rMeanBiased += xcorr(x2,'biased');
-	rMeanUnbiased += xcorr(x2,'unbiased');
+	x3 = media2 + varianza2*randn(1,N);	
+	rMeanBiased = rMeanBiased + xcorr(x3,'biased');
+	rMeanUnbiased = rMeanUnbiased + xcorr(x3,'unbiased');
 end
 
 rMeanBiased = rMeanBiased./100;
@@ -103,10 +92,10 @@ rMeanUnbiased = rMeanUnbiased./100;
 
 figure
 subplot(1,2,1)
-plot(rMeanBiased)
+plot(l,rMeanBiased)
 title ('Biased')
 subplot(1,2,2)
-plot(rMeanUnBiased)
+plot(l,rMeanUnbiased)
 title ('Unbiased')
 
 

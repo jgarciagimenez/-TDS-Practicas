@@ -70,12 +70,12 @@ hold off
 
 Rx = [r2(25) r2(26) ; r2(26) r2(25)];
 rx = [r2(26) ; r2(27)];
-
 ax = inv(Rx)*-rx;
+varianza2 =r2(25) + ax(1)*r2(26) + ax(2)*r2(27);
 
 %%%% Tarea 6 %%%%
 
-PSD4 = 1./fft([1 ax'],1024).^2;
+PSD4 = (b0*varianza2)./fft([1 ax'],1024).^2;
 
 figure 
 hold on 

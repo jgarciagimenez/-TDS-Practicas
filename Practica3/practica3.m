@@ -10,11 +10,10 @@ close all
 %%%  x(n) = (sin((n-nd)*(pi/2)))/((n-nd)*pi);
 
 %%% Tarea 1 %%%
-
 %%% Padé 11 muestras nd=5, p=0, q=10
 
 N=11;
-x = zeros (1,11);
+x = zeros (1,N);
 p_fir=0;
 q_fir=10;
 nd=5;
@@ -63,7 +62,6 @@ hold off
 
 %%% TAREA 2 %%%
 %%% Método de Pronny covarianza
-%%% Calculameos la autoccorelación
 %%% Ecuaciones normales Rx*a = -rx
 
 % Para calcular la matriz de autocorrelacion Rx
@@ -82,41 +80,49 @@ x2(6) = 0.5;  %%% el resultado de la indeterminación cuando hay 0 en el denomina
 s = 5;
 Xs = zeros (N-s-1,6);
 
-for i = 1:N-s-1
-    for j = 1:6
-        Xs(i,j)=x2(5-j+i+1);
-    end
-end
+% for i = 1:N-s-1
+%     for j = 1:6
+%         Xs(i,j)=x2(s-j+i+1);
+%     end
+% end
+Xs = toeplitz(x2(6:N-1),x2(6:-1:2));
 
-xs1 = [Xs(2:end,1)' 0];
+xs1 = x2(7:end);
 Rx = Xs' * Xs;
 rx = Xs' * xs1';
-a_pronny_iir = inv(Rx)*(-rx);
-
+a_prony_iir = inv(Rx)*(-rx);
+a_prony_iir = [1 ; a_prony_iir];
+    
 %%% Prony utiliza padé para los coeficientes b
 X2 = toeplitz(x2,[x2(1) zeros(1,p_irr)]);
 Xo2 = X2(1:p_irr+1,1:end);
-b_pronny_iir= Xo2 * a_pronny_iir;
+b_prony_iir= Xo2 * a_prony_iir;
 
 %%% Ahora repetimos el proceso anterior con el método de shanks
 %%% Los coeficientes a son iguales, cambia los b
 %%% Rg * b = rxg
 %%% Rg = G0' * G0       rgx = [x(2:end) zeros(1,p_irr+1)]
 
-a_shanks_iir = a_pronny_iir;
+a_shanks_iir = a_prony_iir;
 
 delta = [1 zeros(1,999)];
-g = filter(1,a_pronny_iir,delta);
-G0 = toeplitz([g zeros(1,q_irr)],[g(1) zeros(1,q_irr)]);
-Rg = G0' * G0;
-rg0 = [x2 zeros(1,p_irr)];
-rgx = G0' * rg0';
+g = filter(1,a_shanks_iir,delta);
 
-b_shanks_iir = inv(Rg)*(-rgx);
+G0 = zeros(N,q_irr+1);
+
+for i=1:6
+    G0(:,i) = [zeros(1,i-1) g(1:N-i+1)]'; 
+end
+
+Rg = G0' * G0;
+x_0 = x2';
+rgx = G0' * x_0;
+
+b_shanks_iir = inv(Rg)*(rgx);
 
 %%% Calculamos el espectro de potencia de las dos opciones para comparar
 
-[h_pronny_iir,w_iir] = freqz(b_pronny_iir,a_pronny_iir,1024);
+[h_pronny_iir,w_iir] = freqz(b_prony_iir,a_prony_iir,1024);
 h_pronny_iir=10*log(abs(h_pronny_iir));
 
 [h_shanks_iir,w_iir] = freqz(b_shanks_iir,a_shanks_iir,1024);
@@ -134,19 +140,17 @@ hold off
 
 %%% Filtro elíptico
 
-N = 5;
+N2 = 5;
 Rp = 0.1;
 Rs = 40;
-Wp = [0.45];
-[B,A] = ellip(N,Rp,Rs,Wp);
-
+Wp = 0.5;
+[B,A] = ellip(N2,Rp,Rs,Wp);
 
 [h_ellip,w_iir] = freqz(B,A,1024);
 h_ellip=10*log(abs(h_ellip));
 
 figure 
 plot(w,h_ellip)
-
 
 figure 
 
@@ -157,21 +161,30 @@ plot(w,h_pronny_iir,'r')
 plot(w,h_shanks_iir,'k');
 plot(w,h_ellip)
 
-
 legend('Pade','Pronny','Shanks','ellip');
 title('Respuesta en frecuencia filtro IIR por shanks, pronny, pade y ellip');
 
 hold off
 
 
+%%% Calculo de los errores
+% Calculamos los errores como la muestra original menos
+% la respuesta al impulso de los distintos filtros calculados.
 
+delta = [1 zeros(1,999)];
+delta2 = [1 zeros(1,10)];
 
-% X0 = toeplitz([x zeros(1,p_irr)],[x(1) zeros(1,p_irr)]);
-% Rx = X0' * X0;
-% X1 = [x(2:end) zeros(1,p_irr+1)];
-% rx = X0' * X1';
+g_iir_pade = filter(b_iir,a_iir,delta);
+g_iir_prony = filter(b_prony_iir, a_prony_iir,delta);
+g_iir_shanks = filter(b_shanks_iir, a_shanks_iir,delta);
+g_iir_ellip = filter(B,A,delta);
 
-% a_pronny_fir = inv(Rx)*(-rx);
+err_iir_pade = sum((x2 - g_iir_pade).^2);
+err_iir_prony = sum((x2 - g_iir_prony).^2);
+err_iir_shanks = sum((x2 - g_iir_shanks).^2);
+err_iir_ellip = sum((x2 - g_iir_ellip).^2);
+
+err_directo = [err_iir_pade err_iir_prony err_iir_shanks err_iir_ellip];
 
  
  

@@ -8,7 +8,7 @@ load local.asc
 load remota.asc
 load signal.asc
 
-E = 10e-5;
+
 
 SNR = 10*log10( sum(local.^2)/sum((local-signal).^2) );
 
@@ -23,23 +23,40 @@ while U(a) < 0.0512
 end
 
 
-error = zeros(length(U),10);
+errorLocal = zeros(1,length(signal));
+errorLocalDTD = zeros(1,length(signal));
+err = 0;
+
+SNR = zeros(length(U),10);
+SNRDTD = zeros(length(U),10);
+
+
 for i = 1 : length (U)
     
     for p = 1:10   
         wk = zeros(1,p);
-        x = zeros(1:p);
+        x = zeros(1,p);
+
+        errorLocal = NLMS(remota,signal,U(i),p);   
+        errorLocalDTD = DTD(remota,signal,U(i),p);
         
-        for j = 1: length(signal)
-            
-            yk = wk * x';
-            error = sum(signal(1:p)-yk);
-            wk = wk + 2*U(i)*error*x(1:p)./( E+(x(1:p)*x(1:p)')); 
-            x = [remota(j) x(1:p)];
-        end 
-        error(i,p)=error;
+        SNR(i,p) = 10*log10( sum(local.^2)/sum((local-errorLocal').^2) );        
+        SNRDTD(i,p) = 10*log10( sum(local.^2)/sum((local-errorLocalDTD').^2) );
     end
 end
+[x,y] = meshgrid(U,[1:10]);
+surf(x,y,SNR);
+
+figure
+
+surf(x,y,SNRDTD);
+
+
+
+
+
+
+
 
 
 

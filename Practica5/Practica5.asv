@@ -95,10 +95,16 @@ plot(C), title('Cepstrum')
 
 %%% Cepstrum lpc
 
-c_a = zeros(1,12);
-c_a = cepstrumlpc(a,p);
+C2 = zeros(1,12);
+C2(1) = - a_lpc(2);
 
-% > 1,25 88 0,44 - 0,21
+for n = 2:p
+   suma = 0;
+   for k = 1:n 
+       suma = suma + (k/n)*C2(n-1)*a_lpc(n-k+1);
+   end
+   C2(n) =  -a_lpc(n) - suma;
+end
 
 
 
